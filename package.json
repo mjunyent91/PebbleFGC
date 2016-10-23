@@ -1,0 +1,31 @@
+{
+    "author": "mjunyent91@gmail.com",
+    "dependencies": {},
+    "keywords": [],
+    "name": "fgc",
+    "pebble": {
+        "capabilities": [
+            "configurable"
+        ],
+        "displayName": "FGC",
+        "enableMultiJS": false,
+        "messageKeys": [],
+        "projectType": "native",
+        "resources": {
+            "media": []
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "aplite",
+            "basalt",
+            "chalk",
+            "diorite",
+            "emery"
+        ],
+        "uuid": "04f21b2a-1274-440f-8857-5d773fd9dd48",
+        "watchapp": {
+            "watchface": false
+        }
+    },
+    "version": "1.0.0"
+}
