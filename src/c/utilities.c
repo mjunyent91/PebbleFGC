@@ -3,19 +3,19 @@
 uint16_t time_hm_diff(struct time_hm t1, struct time_hm t2) {
   uint16_t minutes;
   
-  //Get hour difference
-  if (t1.hour > t2.hour) {
-    minutes = (t1.hour - t2.hour)*60;
-  } else {
-    minutes = (24 + t1.hour - t2.hour)*60;
-  }
   //Get minute difference
-  if (t1.min > t2.min) {
+  if (t1.min >= t2.min) {
     minutes = t1.min - t2.min;
-    minutes += (t1.hour - t2.hour)*60;
   } else {
     minutes = 60 + t1.min - t2.min;
+    t1.hour--; //one hour was used for the minute subtraction
+  }
+  
+  //Get hour difference
+  if (t1.hour >= t2.hour) {
     minutes += (t1.hour - t2.hour)*60;
+  } else {
+    minutes += (24 + t1.hour - t2.hour)*60; //we don't allow negative numbers, so we think t2 is actually tomorrow
   }
   
   return minutes;
@@ -28,7 +28,7 @@ struct time_ms time_diff(struct time_hm t1, struct tm* t2) {
   //Check for overflow, otherwise return 255,255
   if (minutes < 256) { 
     res.min = minutes - 1; //subtract 1 since we have to account for the seconds (next line)
-    res.sec = 60 - t2->tm_sec;
+    res.sec = 59 - t2->tm_sec;
   }
   return res;
 }

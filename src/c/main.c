@@ -3,6 +3,9 @@
 //STATIC for a global variable or a function: only accessible from this file; for a variable inside a function: the variable keeps its value between function calls
 
 /*** Constants ***/
+#define PERSISTKEY_WAKEUP_ID 1 //Persistent storage key for the wakeup id.
+#define PERSISTKEY_WAKEUP_TIME 2 //Persistent storage key for the wakeup time.
+#define WAKE_UP_MIN_BEFORE 15 //Wake up X minutes before the train leaves
 #define NUMBER_OF_LAYERS 20 //Number of layers in the layer list.
 #define TIME_BUFFER_SIZE 8 //Size of the countdown char buffer.
 #define TRIP_IN_LAYER_WIDTH 0.8 //Percentage width and height of the station information (name and departure/arrival time). There will be a margin left of TRIP_IN_LAYER_WIDTH/2 per side.
@@ -22,8 +25,6 @@ static TextLayer* dep_station_layer;
 static TextLayer* dep_time_layer;
 static TextLayer* arr_station_layer;
 static TextLayer* arr_time_layer;
-
-struct tm* time_test;
 
 static time_t current_time;
 static char time_buffer[TIME_BUFFER_SIZE];
@@ -45,10 +46,25 @@ static void destroy_all_layers(){
   layerListIndex = 0;
 }
 
-
+/*
+static void scheduleWakeup(){
+  //Cancel all wakeups
+  wakeup_cancel_all();
+  
+  //Set a new one: later today or tomorrow?
+  struct tm wakeup_time;
+  struct tm* now = localtime(current_time);
+  if (now->tm_hour > ) {
+    wakeup_time = current_time;
+  } else {
+    
+  }
+  wakeup_schedule(mktime(wakeup_time), 0, FALSE);
+}
+*/
 
 static void update_time() {
-  // Get a tm structure
+  //Get a tm structure
   current_time = time(NULL);
 }
 
@@ -56,9 +72,7 @@ static bool countdown_update(TextLayer *text_layer) {
   bool res = TRUE;
   // Display this time on the TextLayer
   struct tm* time_now = localtime(&current_time);
-  *time_test = *time_now;
-  time_test->tm_hour = 18;
-  struct time_ms timeToTrain = time_diff(trainPlcatSqv1836.depTime, time_test);
+  struct time_ms timeToTrain = time_diff(trainPlcatSqv1836.depTime, time_now);
   
   if (timeToTrain.min < 60) {
     if (! write_time_ms(time_buffer, TIME_BUFFER_SIZE, timeToTrain, TRUE)){
@@ -163,9 +177,6 @@ static void handle_init(void) {
   trainPlcatSqv1836.arrTime.hour = 19;
   trainPlcatSqv1836.arrTime.min = 14;
   
-  //Allocate memory for tm struct for testing
-  time_test = (struct tm*) malloc(sizeof(struct tm));
-  
   trip_window = window_create();
   window_set_window_handlers(trip_window, (WindowHandlers) {
     .load = trip_window_load,
@@ -176,8 +187,8 @@ static void handle_init(void) {
 }
 
 static void handle_deinit(void) {
+  //scheduleWakeup();
   window_destroy(trip_window);
-  free(time_test);
 }
 
 /*** Main ***/
