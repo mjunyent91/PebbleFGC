@@ -8,7 +8,7 @@
 #define WAKE_UP_MIN_BEFORE 15 //Wake up X minutes before the train leaves
 #define NUMBER_OF_LAYERS 20 //Number of layers in the layer list.
 #define TIME_BUFFER_SIZE 8 //Size of the countdown char buffer.
-#define TRIP_IN_LAYER_WIDTH 0.8 //Percentage width and height of the station information (name and departure/arrival time). There will be a margin left of TRIP_IN_LAYER_WIDTH/2 per side.
+#define TRIP_IN_LAYER_WIDTH 0.9 //Percentage width and height of the station information (name and departure/arrival time). There will be a margin left of TRIP_IN_LAYER_WIDTH/2 per side.
 #define TRIP_IN_LAYER_HEIGHT 0.8
 #define STATION_NAME_WIDTH 0.7 //Percentage of TRIP_LAYER_WIDTH and TRIP_LAYER_HEIGHT. The departure and arrival times layer width will be 1-STATION_NAME_WIDTH.
 #define STATION_NAME_HEIGHT 0.3 //The countdown height will be 1-2*STATION_NAME_HEIGHT.
@@ -95,28 +95,28 @@ static void trip_window_load(Window *window) {
   dep_station_layer = text_layer_create(dep_station_bounds);
   add_child_layer(in_trip_layer,  text_layer_get_layer(dep_station_layer));
   init_text_layer(dep_station_layer);
-  text_layer_set_font(dep_station_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+  text_layer_set_font(dep_station_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
   text_layer_set_text_alignment(dep_station_layer, GTextAlignmentLeft);
   
   //Create departure station time field. Once we have the measurements of the departure station name layer it's easy:
   dep_time_layer = text_layer_create(GRect(dep_station_bounds.size.w+1, 0, in_trip_layer_bounds.size.w-dep_station_bounds.size.w, dep_station_bounds.size.h));
   add_child_layer(in_trip_layer, text_layer_get_layer(dep_time_layer));
   init_text_layer(dep_time_layer);
-  text_layer_set_font(dep_time_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+  text_layer_set_font(dep_time_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
   text_layer_set_text_alignment(dep_time_layer, GTextAlignmentRight);
   
   //Create arrival station name field
   arr_station_layer = text_layer_create(GRect(0, dep_station_bounds.size.h+1, dep_station_bounds.size.w, dep_station_bounds.size.h));
   add_child_layer(in_trip_layer, text_layer_get_layer(arr_station_layer));
   init_text_layer(arr_station_layer);
-  text_layer_set_font(arr_station_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+  text_layer_set_font(arr_station_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
   text_layer_set_text_alignment(arr_station_layer, GTextAlignmentLeft);
   
   //Create arrival station time field.
   arr_time_layer = text_layer_create(GRect(dep_station_bounds.size.w+1, dep_station_bounds.size.h+1, in_trip_layer_bounds.size.w-dep_station_bounds.size.w, dep_station_bounds.size.h));
   add_child_layer(in_trip_layer, text_layer_get_layer(arr_time_layer));
   init_text_layer(arr_time_layer);
-  text_layer_set_font(arr_time_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+  text_layer_set_font(arr_time_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
   text_layer_set_text_alignment(arr_time_layer, GTextAlignmentRight);
   
   //Create the countdown TextLayer and initialize it
