@@ -1,36 +1,40 @@
 #include "utilities.h"
 
-uint16_t time_hm_diff(struct time_hm t1, struct time_hm t2) {
-  uint16_t minutes;
+bool time_hm_minutes_diff(struct time_hm t1, struct time_hm t2, uint16_t* result) {
+  bool success = TRUE; //Returns true if the difference was successful (t1 is today) or false otherwise (t1 is tomorrow).
   
   //Get minute difference
   if (t1.min >= t2.min) {
-    minutes = t1.min - t2.min;
+    *result = t1.min - t2.min;
   } else {
-    minutes = 60 + t1.min - t2.min;
+    *result = 60 + t1.min - t2.min;
     t1.hour--; //one hour was used for the minute subtraction
   }
   
   //Get hour difference
   if (t1.hour >= t2.hour) {
-    minutes += (t1.hour - t2.hour)*60;
+    *result += (t1.hour - t2.hour)*60;
   } else {
-    minutes += (24 + t1.hour - t2.hour)*60; //we don't allow negative numbers, so we think t2 is actually tomorrow
+    *result += (24 + t1.hour - t2.hour)*60; //we don't allow negative numbers, so we think t2 is actually tomorrow
+    success = FALSE;
   }
   
-  return minutes;
+  return success;
 }
 
-struct time_ms time_diff(struct time_hm t1, struct tm* t2) {
-  struct time_ms res = {255, 255};
+bool time_diff(struct time_hm t1, struct tm* t2, struct time_ms* result) {
   struct time_hm t2hm = {t2->tm_hour, t2->tm_min};
-  uint16_t minutes = time_hm_diff(t1, t2hm);
+  uint16_t minutes;
+  bool success = time_hm_minutes_diff(t1, t2hm, &minutes);
   //Check for overflow, otherwise return 255,255
   if (minutes < 256) { 
-    res.min = minutes - 1; //subtract 1 since we have to account for the seconds (next line)
-    res.sec = 59 - t2->tm_sec;
+    result->min = minutes - 1; //subtract 1 since we have to account for the seconds (next line)
+    result->sec = 59 - t2->tm_sec;
+  } else {
+    result->min = 255;
+    result->sec = 255;
   }
-  return res;
+  return success;
 }
 
 bool write_tm(char* buffer, int max_size, struct tm* time) {

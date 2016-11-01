@@ -46,22 +46,25 @@ static void destroy_all_layers(){
   layerListIndex = 0;
 }
 
-/*
+//TODO: change 
 static void scheduleWakeup(){
   //Cancel all wakeups
   wakeup_cancel_all();
   
   //Set a new one: later today or tomorrow?
   struct tm wakeup_time;
-  struct tm* now = localtime(current_time);
-  if (now->tm_hour > ) {
-    wakeup_time = current_time;
-  } else {
-    
+  struct tm* now = localtime(&current_time);
+  struct time_ms timeToTrain;
+  bool today = time_diff(trainPlcatSqv1836.depTime, now, &timeToTrain);
+  int32_t maybe_tomorrow = 0;
+  wakeup_time = *now;
+  wakeup_time.tm_hour = trainPlcatSqv1836.depTime.hour;
+  wakeup_time.tm_min = trainPlcatSqv1836.depTime.min - 10;
+  if (today) {
+    maybe_tomorrow = 3600; //in seconds
   }
-  wakeup_schedule(mktime(wakeup_time), 0, FALSE);
+  wakeup_schedule(mktime(&wakeup_time) + maybe_tomorrow, 0, FALSE);
 }
-*/
 
 static void update_time() {
   //Get a tm structure
@@ -72,7 +75,8 @@ static bool countdown_update(TextLayer *text_layer) {
   bool res = TRUE;
   // Display this time on the TextLayer
   struct tm* time_now = localtime(&current_time);
-  struct time_ms timeToTrain = time_diff(trainPlcatSqv1836.depTime, time_now);
+  struct time_ms timeToTrain;
+  time_diff(trainPlcatSqv1836.depTime, time_now, &timeToTrain);
   
   if (timeToTrain.min < 60) {
     if (! write_time_ms(time_buffer, TIME_BUFFER_SIZE, timeToTrain, TRUE)){
@@ -171,11 +175,11 @@ static void handle_init(void) {
   
   //Set train trip data
   strcpy(trainPlcatSqv1836.depStation, "Pl. Catalunya"); //13 + NULL = 14
-  trainPlcatSqv1836.depTime.hour = 18;
-  trainPlcatSqv1836.depTime.min = 36;
+  trainPlcatSqv1836.depTime.hour = 17;//18;
+  trainPlcatSqv1836.depTime.min = 24;//36;
   strcpy(trainPlcatSqv1836.arrStation, "Sant Quirze"); //11 + NULL = 12
-  trainPlcatSqv1836.arrTime.hour = 19;
-  trainPlcatSqv1836.arrTime.min = 14;
+  trainPlcatSqv1836.arrTime.hour = 18;//19;
+  trainPlcatSqv1836.arrTime.min = 02;//14;
   
   trip_window = window_create();
   window_set_window_handlers(trip_window, (WindowHandlers) {
