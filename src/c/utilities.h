@@ -22,8 +22,10 @@ struct train_trip{ //32 bytes
   struct time_hm arrTime;
 };
 
-bool time_hm_minutes_diff(struct time_hm t1, struct time_hm t2, uint16_t* result);
+bool minutes_diff(struct time_hm t1, struct time_hm t2, uint16_t* result);
+bool tm_minutes_diff(struct time_hm t1, struct tm* t2, uint16_t* result);
 bool time_diff(struct time_hm t1, struct tm* t2, struct time_ms* result);
 bool write_tm(char* buffer, int max_size, struct tm* time);
 bool write_time_ms(char* buffer, int max_size, struct time_ms time, bool negative);
 bool write_time_hm(char* buffer, int max_size, struct time_hm time, bool negative);
+bool scheduleWakeup(struct time_hm scheduleTime, uint8_t minBefore);

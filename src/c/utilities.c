@@ -1,6 +1,6 @@
 #include "utilities.h"
 
-bool time_hm_minutes_diff(struct time_hm t1, struct time_hm t2, uint16_t* result) {
+bool minutes_diff(struct time_hm t1, struct time_hm t2, uint16_t* result) {
   bool success = TRUE; //Returns true if the difference was successful (t1 is today) or false otherwise (t1 is tomorrow).
   
   //Get minute difference
@@ -22,10 +22,15 @@ bool time_hm_minutes_diff(struct time_hm t1, struct time_hm t2, uint16_t* result
   return success;
 }
 
+bool tm_minutes_diff(struct time_hm t1, struct tm* t2, uint16_t* result) {
+  struct time_hm t2hm = {t2->tm_hour, t2->tm_min};
+  return minutes_diff(t1, t2hm, result);
+}
+
 bool time_diff(struct time_hm t1, struct tm* t2, struct time_ms* result) {
   struct time_hm t2hm = {t2->tm_hour, t2->tm_min};
   uint16_t minutes;
-  bool success = time_hm_minutes_diff(t1, t2hm, &minutes);
+  bool success = minutes_diff(t1, t2hm, &minutes);
   //Check for overflow, otherwise return 255,255
   if (minutes < 256) { 
     result->min = minutes - 1; //subtract 1 since we have to account for the seconds (next line)
@@ -66,4 +71,16 @@ bool write_time_ms(char* buffer, int max_size, struct time_ms time, bool negativ
 bool write_time_hm(char* buffer, int max_size, struct time_hm time, bool negative) {
   struct time_ms t = {time.hour, time.min};
   return write_time_ms(buffer, max_size, t, negative);
+}
+
+bool scheduleWakeup(struct time_hm scheduleTime, uint8_t minBefore){
+  //Cancel all wakeups
+  wakeup_cancel_all();
+  
+  //Set a new one
+  time_t currentTime = time(NULL);
+  struct tm* now = localtime(&currentTime);
+  uint16_t minToSchedule;
+  tm_minutes_diff(scheduleTime, now, &minToSchedule);
+  return wakeup_schedule(currentTime + 60*(minToSchedule - minBefore), 0, FALSE) >= 0; //negative values are errors
 }
